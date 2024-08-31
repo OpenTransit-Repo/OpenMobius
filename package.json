@@ -1,0 +1,14 @@
+{
+  "name": "openmobius",
+  "version": "1.0.0",
+  "description": "An open API wrapper for Mobius transport.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "devDependencies": {
+    "@stylistic/eslint-plugin": "^2.7.2",
+    "@typescript-eslint/parser": "^8.3.0"
+  }
+}
