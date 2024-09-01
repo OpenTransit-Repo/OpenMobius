@@ -2,15 +2,18 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.OpenMobius = void 0;
 const gtfs_1 = require("./gtfs");
+const scoop_api_1 = require("./scoop_api");
 const scoop_api_base_url = "https://api.scoop.airweb.fr";
 const scoop_api_authorization_header = "Basic c2Nvb3AuaW9zLnN0Z2E6OUJMYzJxWXBGWTVKVkZVUzlQcVRNMzdUc2Q0ODV5";
 class OpenMobius {
-    constructor() {
-        this.gtfs = gtfs_1.gtfs;
-        this.scoop_api_access_token = "";
-        this.scoop_api_token_type = "";
-        this.scoop_api_expiration_date = new Date().toISOString();
-        this.scoop_api_scope = [
+    generate_authorization_header() {
+        return `Bearer ${this.scoop_api_token.access_token}`;
+    }
+    export_token() {
+        return this.scoop_api_token;
+    }
+    async init() {
+        this.scoop_api_token = await this.scoop_api.auth.post_token("client_credentials", [
             "scoop.ad.read",
             "scoop.line.read",
             "scoop.map.read",
@@ -19,54 +22,35 @@ class OpenMobius {
             "scoop.poi.read",
             "scoop.price.read",
             "scoop.stop.read",
-            "scoop.traffic.read"
-        ];
+            "scoop.traffic.read",
+            "scoop.network.read"
+        ]);
+        this.scoop_api_network = (await this.scoop_api.networks.get_all_networks())[0];
     }
-    scoop_api_token_get() {
-        console.log(new Date(this.scoop_api_expiration_date));
-        return {
-            access_token: this.scoop_api_access_token,
-            expiration_date: this.scoop_api_expiration_date,
-            expires_in: (new Date(this.scoop_api_expiration_date).getTime() - new Date().getTime()) / 1000,
-            scopes: this.scoop_api_scope,
-            token_type: this.scoop_api_token_type
-        };
-    }
-    async scoop_api_token_create() {
-        let f = await fetch(`${scoop_api_base_url}/auth/token`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/x-www-form-urlencoded",
-                "Authorization": scoop_api_authorization_header
+    constructor() {
+        this.scoop_api = {
+            ...scoop_api_1.scoop_api,
+            auth: {
+                ...scoop_api_1.scoop_api.auth,
+                post_token: (grant_type, scope) => scoop_api_1.scoop_api.auth.post_token(grant_type, scope, scoop_api_base_url, scoop_api_authorization_header)
             },
-            body: new URLSearchParams({
-                grant_type: "client_credentials",
-                scope: this.scoop_api_scope.join(" ")
-            }).toString()
-        });
-        if (f.status !== 201) {
-            throw new Error("Failed to get access_token from the scoop API : Api returned " + f.status + " status code");
-        }
-        let j = await f.json();
-        let expiration_date = new Date((new Date()).getTime() + (j.expires_in * 1000));
-        this.scoop_api_access_token = j.access_token;
-        this.scoop_api_token_type = j.token_type;
-        this.scoop_api_scope = j.scope.split(" ");
-        this.scoop_api_expiration_date = expiration_date.toISOString();
-        return {
-            access_token: j.access_token,
-            token_type: j.token_type,
-            expires_in: j.expires_in,
-            expiration_date: expiration_date.toISOString(),
-            scopes: j.scope.split(" ")
+            networks: {
+                ...scoop_api_1.scoop_api.networks,
+                get_all_networks: () => scoop_api_1.scoop_api.networks.get_all_networks(scoop_api_base_url, this.generate_authorization_header()),
+                get_network: (network_id) => scoop_api_1.scoop_api.networks.get_network(network_id, scoop_api_base_url, this.generate_authorization_header())
+            }
+        };
+        this.gtfs = {
+            ...gtfs_1.gtfs,
+            checkversion: {
+                ...gtfs_1.gtfs.checkversion,
+                get: (appVersion, os) => gtfs_1.gtfs.checkversion.get(appVersion, os, this.scoop_api_network.gtfs)
+            }
         };
     }
 }
 exports.OpenMobius = OpenMobius;
 let openmobius = new OpenMobius();
-openmobius.scoop_api_token_create().then(() => {
-    console.log(openmobius.scoop_api_token_get());
-    setTimeout(() => {
-        console.log(openmobius.scoop_api_token_get());
-    }, 5000);
+openmobius.init().then(async () => {
+    console.log(await openmobius.scoop_api.networks.get_network(36));
 });

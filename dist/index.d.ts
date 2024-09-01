@@ -1,15 +1,24 @@
-import { ScoopApiToken } from "./gtfs/types";
+import { scoop_api_scope } from "./scoop_api/types/scope";
+import { scoop_api_token } from "./scoop_api/types/token";
+import { scoop_api_network } from "./scoop_api/types/network";
+import { EventEmitter } from 'events';
 declare class OpenMobius {
-    private scoop_api_access_token;
-    private scoop_api_token_type;
-    private scoop_api_expiration_date;
-    private scoop_api_scope;
-    constructor();
-    scoop_api_token_get(): ScoopApiToken;
-    scoop_api_token_create(): Promise<ScoopApiToken>;
+    private scoop_api_token;
+    private scoop_api_network?;
+    events: EventEmitter;
+    private generate_authorization_header;
+    scoop_api: {
+        auth: {
+            post_token: (grant_type: string, scope: Array<scoop_api_scope>) => Promise<scoop_api_token>;
+        };
+        networks: {
+            get_all_networks: () => Promise<scoop_api_network[]>;
+            get_network: (network_id: number) => Promise<scoop_api_network>;
+        };
+    };
     gtfs: {
         checkversion: {
-            get: typeof import("./gtfs/checkversion/get").get;
+            get: (appVersion: string, os: string) => Promise<import("./gtfs/checkversion/types").GTFS_checkversion_get>;
         };
         config: {
             getTheme: typeof import("./gtfs/config/getTheme").getTheme;
@@ -72,5 +81,8 @@ declare class OpenMobius {
             getTermOfUse: typeof import("./gtfs/terms/getTermOfUse").getTermOfUse;
         };
     };
+    export_token(): scoop_api_token;
+    init(): Promise<void>;
+    constructor();
 }
 export { OpenMobius };

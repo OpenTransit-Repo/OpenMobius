@@ -7,6 +7,9 @@
   "files": [
     "dist"
   ],
+  "dependencies": {
+
+  },
   "devDependencies": {
     "@stylistic/eslint-plugin": "^2.7.2",
     "@typescript-eslint/parser": "^8.3.0"
