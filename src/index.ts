@@ -42,6 +42,17 @@ class OpenMobius {
                 scoop_api_base_url,
                 this.generate_authorization_header()
             )
+        },
+        stop: {
+            get_all_stops: () => scoop_api.stops.get_all_stops(
+                scoop_api_base_url,
+                this.generate_authorization_header()
+            ),
+            get_stop: (stop_id: string) => scoop_api.stops.get_stop(
+                stop_id,
+                scoop_api_base_url,
+                this.generate_authorization_header()
+            )
         }
     }
 

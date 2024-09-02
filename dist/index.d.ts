@@ -1,11 +1,9 @@
 import { scoop_api_scope } from "./scoop_api/types/scope";
 import { scoop_api_token } from "./scoop_api/types/token";
 import { scoop_api_network } from "./scoop_api/types/network";
-import { EventEmitter } from 'events';
 declare class OpenMobius {
     private scoop_api_token;
     private scoop_api_network?;
-    events: EventEmitter;
     private generate_authorization_header;
     scoop_api: {
         auth: {
@@ -14,6 +12,16 @@ declare class OpenMobius {
         networks: {
             get_all_networks: () => Promise<scoop_api_network[]>;
             get_network: (network_id: number) => Promise<scoop_api_network>;
+            get_network_contact: (network_id: number) => Promise<void>;
+            get_network_tos: (network_id: number) => Promise<void>;
+        };
+        stop: {
+            get_all_stops: () => Promise<import("./scoop_api/types/stop").scoop_api_stop[]>;
+            get_stop: (stop_id: string) => Promise<import("./scoop_api/types/stop").scoop_api_stop>;
+        };
+        stops: {
+            get_all_stops: typeof import("./scoop_api/stops/get_all_stops").get_all_stops;
+            get_stop: typeof import("./scoop_api/stops/get_stop").get_stop;
         };
     };
     gtfs: {
