@@ -91,3 +91,9 @@ class OpenMobius {
 }
 
 export {OpenMobius};
+
+
+let openmobius = new OpenMobius();
+openmobius.init().then(() => {
+    openmobius.scoop_api.networks.get_network_tos(36).then(console.log)
+});

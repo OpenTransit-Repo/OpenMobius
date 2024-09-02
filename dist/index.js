@@ -57,5 +57,5 @@ class OpenMobius {
 exports.OpenMobius = OpenMobius;
 let openmobius = new OpenMobius();
 openmobius.init().then(() => {
-    openmobius.scoop_api.networks.get_network_contact(36).then(console.log);
+    openmobius.scoop_api.networks.get_network_tos(36).then(console.log);
 });

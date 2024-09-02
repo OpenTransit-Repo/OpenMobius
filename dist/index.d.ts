@@ -13,7 +13,7 @@ declare class OpenMobius {
             get_all_networks: () => Promise<scoop_api_network[]>;
             get_network: (network_id: number) => Promise<scoop_api_network>;
             get_network_contact: (network_id: number) => Promise<import("./scoop_api/types/network").scoop_api_network_contact>;
-            get_network_tos: (network_id: number) => Promise<void>;
+            get_network_tos: (network_id: number) => Promise<import("./scoop_api/types/network").scoop_api_network_tos>;
         };
         stop: {
             get_all_stops: () => Promise<import("./scoop_api/types/stop").scoop_api_stop[]>;

@@ -40,3 +40,22 @@ export type scoop_api_network_contact = {
         text: string,
     }
 }
+
+export type scoop_api_network_tos_response = {
+    id: number,
+    tos: string,
+    created_at: string,
+    updated_at: string,
+    network_id: number
+}
+
+export type scoop_api_network_tos = {
+    id: number,
+    tos: {
+        html: string,
+        text: string,
+    },
+    created_at: Date,
+    updated_at: Date,
+    network_id: number
+}
